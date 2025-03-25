@@ -5,7 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>System Monitor Dashboard</title>
     <style>
-        /* ... previous styles remain the same ... */
+        body { font-family: Arial, sans-serif; }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 20px; 
+        }
+        th, td { 
+            border: 1px solid #ddd; 
+            padding: 8px; 
+            text-align: left; 
+        }
+        th { background-color: #f2f2f2; }
         .error-message {
             color: red;
             text-align: center;
@@ -26,8 +37,8 @@
             const lastUpdatedContainer = document.getElementById('last-updated');
             
             try {
-                // Fetch the system data JSON file with cache-busting
-                const response = await fetch('/system-data.json?_=' + new Date().getTime());
+                // Fetch the system data from Netlify function
+                const response = await fetch('/.netlify/functions/serve-data');
                 
                 // Check if response is OK
                 if (!response.ok) {

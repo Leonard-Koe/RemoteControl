@@ -2,13 +2,8 @@
   functions = "functions"
   publish = "."
 
-[[redirects]]
-  from = "/system-data.json"
-  to = "/system-data.json"
-  status = 200
-
 [[headers]]
-  for = "/system-data.json"
+  for = "/.netlify/functions/*"
   [headers.values]
     Access-Control-Allow-Origin = "*"
     Content-Type = "application/json"

@@ -14,31 +14,24 @@ exports.handler = async (event, context) => {
     // Parse incoming system data
     const systemData = JSON.parse(event.body);
 
-    // Use project root for data persistence
-    const dataFilePath = path.join(__dirname, '..', 'system-data.json');
-
-    // Read existing data
-    let existingData = [];
-    try {
-      const rawData = await fs.readFile(dataFilePath, 'utf8');
-      existingData = JSON.parse(rawData);
-    } catch (readError) {
-      console.log('Creating new data file');
-    }
+    // Retrieve existing data from environment variable or create new
+    const existingDataStr = process.env.SYSTEM_DATA || '[]';
+    let existingData = JSON.parse(existingDataStr);
 
     // Add new data point with receive timestamp
-    existingData.push({
+    const newEntry = {
       ...systemData,
       receivedAt: new Date().toISOString()
-    });
+    };
+    existingData.push(newEntry);
 
     // Keep only last 50 entries
     if (existingData.length > 50) {
       existingData = existingData.slice(-50);
     }
 
-    // Write updated data back to file
-    await fs.writeFile(dataFilePath, JSON.stringify(existingData, null, 2));
+    // Update environment variable
+    process.env.SYSTEM_DATA = JSON.stringify(existingData);
 
     return {
       statusCode: 200,
@@ -57,5 +50,16 @@ exports.handler = async (event, context) => {
       statusCode: 500, 
       body: JSON.stringify({ message: 'Error processing data', error: error.toString() }) 
     };
+  }
+};
+
+// Export a function to retrieve the data
+exports.getSystemData = async () => {
+  try {
+    const existingDataStr = process.env.SYSTEM_DATA || '[]';
+    return JSON.parse(existingDataStr);
+  } catch (error) {
+    console.error('Error retrieving data:', error);
+    return [];
   }
 };

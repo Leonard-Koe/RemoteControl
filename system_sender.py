@@ -34,9 +34,8 @@ def send_data_to_netlify(url, data):
     if not url.startswith(('http://', 'https://')):
         url = f'https://{url}'
     
-    # Ensure URL ends with the correct function path
-    if not url.endswith('/receive-data'):
-        url = urllib.parse.urljoin(url, '.netlify/functions/receive-data')
+    # Use full path to receive-data function
+    url = f"{url.rstrip('/')}/api/receive-data"
     
     try:
         headers = {
@@ -62,7 +61,7 @@ def send_data_to_netlify(url, data):
 
 def main():
     # Replace with your actual Netlify site URL
-    netlify_endpoint = "https://remotecontrol1.netlify.app"
+    netlify_endpoint = "remotecontrol1.netlify.app"
     
     while True:
         try:
