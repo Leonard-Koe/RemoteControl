@@ -14,10 +14,6 @@
     X-Content-Type-Options = "nosniff"
     X-Frame-Options = "DENY"
 
-[build]
-  functions = "functions"
-  publish = "."
-
 # Enable KV storage
 [[kv]]
   name = "SYSTEM_DATA"
