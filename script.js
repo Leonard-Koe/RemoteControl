@@ -1,10 +1,15 @@
 class WebSocketClient {
     constructor() {
-        this.socket = null;
+        // Standardmäßige WebSocket-Server-URL
+        this.defaultServerUrl = 'wss://uXenon.pythonanywhere.com';
+        
         this.connectionStatus = document.getElementById('connectionStatus');
         this.dataDisplay = document.getElementById('dataDisplay');
         this.serverIPInput = document.getElementById('serverIP');
         this.connectBtn = document.getElementById('connectBtn');
+
+        // Setze Standardwert
+        this.serverIPInput.value = this.defaultServerUrl;
 
         this.connectBtn.addEventListener('click', () => this.connectWebSocket());
     }
@@ -43,8 +48,10 @@ class WebSocketClient {
             Luftfeuchtigkeit: ${data.humidity}%
         `;
         
-        this.dataDisplay.appendChild(dataRow);
+        this.dataDisplay.insertBefore(dataRow, this.dataDisplay.firstChild);
     }
 }
 
-new WebSocketClient();
+document.addEventListener('DOMContentLoaded', () => {
+    new WebSocketClient();
+});

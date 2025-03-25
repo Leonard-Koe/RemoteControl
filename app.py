@@ -3,6 +3,7 @@ import websockets
 import json
 import random
 import datetime
+import os
 
 class DataGenerator:
     @staticmethod
@@ -13,40 +14,33 @@ class DataGenerator:
             'timestamp': datetime.datetime.now().isoformat()
         }
 
-connected_clients = set()
-
-async def register(websocket):
-    connected_clients.add(websocket)
-    print(f"Neuer Client verbunden. Gesamte Clients: {len(connected_clients)}")
-
-async def unregister(websocket):
-    connected_clients.remove(websocket)
-    print(f"Client getrennt. Gesamte Clients: {len(connected_clients)}")
-
-async def data_sender(websocket, path=None):
+async def websocket_handler(websocket, path):
     try:
-        await register(websocket)
         while True:
+            # Generiere Sensordaten
             data = DataGenerator.generate_sensor_data()
+            
+            # Sende Daten an verbundene Clients
             await websocket.send(json.dumps(data))
+            
+            # Warte 2 Sekunden
             await asyncio.sleep(2)
     except websockets.exceptions.ConnectionClosed:
-        print("Client-Verbindung geschlossen")
-    finally:
-        await unregister(websocket)
+        print("Client disconnected")
 
-async def start_websocket_server():
+async def main():
+    # Server auf allen Netzwerkschnittstellen
     server = await websockets.serve(
-        data_sender, 
+        websocket_handler, 
         "0.0.0.0", 
         8765,
+        # Erlaube Verbindungen von überall
         origins=["*"]
     )
-    print("WebSocket-Server gestartet")
+    
+    print("WebSocket-Server läuft")
     await server.wait_closed()
 
-def run_server():
-    asyncio.run(start_websocket_server())
-
+# Starten des Servers
 if __name__ == "__main__":
-    run_server()
+    asyncio.run(main())
