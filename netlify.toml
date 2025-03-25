@@ -13,7 +13,3 @@
   [headers.values]
     X-Content-Type-Options = "nosniff"
     X-Frame-Options = "DENY"
-
-# Enable KV storage
-[[kv]]
-  name = "SYSTEM_DATA"

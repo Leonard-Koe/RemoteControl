@@ -1,56 +1,62 @@
-exports.handler = async (event, context) => {
+const fs = require('fs').promises;
+const path = require('path');
+
+exports.handler = async (event) => {
     console.log('Received request with method:', event.httpMethod);
-    console.log('Request headers:', event.headers);
-    console.log('Request body:', event.body);
-  
+    
     // Only allow POST requests
     if (event.httpMethod !== 'POST') {
-      console.error('Method Not Allowed');
-      return { 
-        statusCode: 405, 
-        body: JSON.stringify({ message: 'Method Not Allowed' }) 
-      };
+        return { 
+            statusCode: 405, 
+            body: JSON.stringify({ message: 'Method Not Allowed' }) 
+        };
     }
   
     try {
-      // Parse incoming system data
-      const systemData = JSON.parse(event.body);
-      console.log('Parsed system data:', JSON.stringify(systemData, null, 2));
-  
-      // Check if Netlify KV is available
-      if (typeof context.storage === 'undefined') {
-        console.error('Netlify KV storage not configured');
+        // Parse incoming system data
+        const systemData = JSON.parse(event.body);
+        systemData.receivedAt = new Date().toISOString();
         
-        // Optional: Log to a file or send to an external logging service
-        const logEntry = {
-          timestamp: new Date().toISOString(),
-          message: 'KV Storage Not Configured',
-          data: systemData
-        };
+        // Attempt to use persistent storage
+        const dataFilePath = path.join(__dirname, 'system_data.json');
         
-        // You might want to implement a more robust logging mechanism here
+        let existingData = [];
+        try {
+            const existingDataRaw = await fs.readFile(dataFilePath, 'utf8');
+            existingData = JSON.parse(existingDataRaw);
+        } catch (readError) {
+            console.warn('No existing data file found. Creating new one.');
+        }
+        
+        // Add new entry and keep last 50
+        existingData.push(systemData);
+        if (existingData.length > 50) {
+            existingData = existingData.slice(-50);
+        }
+        
+        // Write back to file
+        await fs.writeFile(dataFilePath, JSON.stringify(existingData, null, 2));
         
         return {
-          statusCode: 500,
-          body: JSON.stringify({ 
-            message: 'KV Storage Configuration Error',
-            details: 'Please verify Netlify KV storage setup',
-            receivedData: systemData
-          })
+            statusCode: 200,
+            headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            body: JSON.stringify({ 
+                message: 'Data received successfully',
+                entriesCount: existingData.length 
+            })
         };
-      }
-  
-      // Rest of the existing implementation remains the same
-      // ...
     } catch (error) {
-      console.error('Error processing data:', error);
-      return { 
-        statusCode: 500, 
-        body: JSON.stringify({ 
-          message: 'Error processing data', 
-          error: error.toString(),
-          details: error.stack 
-        }) 
-      };
+        console.error('Error processing data:', error);
+        return { 
+            statusCode: 500, 
+            body: JSON.stringify({ 
+                message: 'Error processing data', 
+                error: error.toString(),
+                details: error.stack 
+            }) 
+        };
     }
-  };
+};
