@@ -2,8 +2,12 @@
 let systemData = [];
 
 const handler = async (event, context) => {
+  console.log('Received request with method:', event.httpMethod);
+  console.log('Current stored data:', systemData);
+
   // Only allow GET requests
   if (event.httpMethod !== 'GET') {
+    console.error('Method Not Allowed');
     return { 
       statusCode: 405, 
       body: JSON.stringify({ message: 'Method Not Allowed' }) 
@@ -23,19 +27,13 @@ const handler = async (event, context) => {
     console.error('Error serving data:', error);
     return { 
       statusCode: 500, 
-      body: JSON.stringify({ message: 'Error serving data', error: error.toString() }) 
+      body: JSON.stringify({ 
+        message: 'Error serving data', 
+        error: error.toString(),
+        details: error.stack 
+      }) 
     };
   }
 };
 
-// Modify this to update the global data
-const updateSystemData = (newData) => {
-  systemData.push(newData);
-  
-  // Keep only last 50 entries
-  if (systemData.length > 50) {
-    systemData = systemData.slice(-50);
-  }
-};
-
-module.exports = { handler, updateSystemData };
+module.exports = { handler };
