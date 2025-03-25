@@ -3,13 +3,18 @@
   publish = "."
 
 [[redirects]]
-  from = "/*"
-  to = "/index.html"
+  from = "/system-data.json"
+  to = "/system-data.json"
   status = 200
+
+[[headers]]
+  for = "/system-data.json"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Content-Type = "application/json"
 
 [[headers]]
   for = "/*"
   [headers.values]
     X-Content-Type-Options = "nosniff"
     X-Frame-Options = "DENY"
-    Access-Control-Allow-Origin = "*"
