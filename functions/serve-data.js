@@ -1,5 +1,4 @@
-const fs = require('fs').promises;
-const path = require('path');
+const { systemDataStore } = require('./receive-data');
 
 exports.handler = async (event) => {
     console.log('Serve Data Function - Start');
@@ -16,16 +15,10 @@ exports.handler = async (event) => {
     }
 
     try {
-        // Path to the data file
-        const dataFilePath = path.join(__dirname, 'system_data.json');
-        
-        let systemData = [];
-        try {
-            const dataRaw = await fs.readFile(dataFilePath, 'utf8');
-            systemData = JSON.parse(dataRaw);
-        } catch (readError) {
-            console.warn('No system data file found. Using fallback data.');
-            systemData = [
+        // If no data, provide fallback
+        const dataToSend = systemDataStore.length > 0 
+            ? systemDataStore 
+            : [
                 {
                     timestamp: new Date().toISOString(),
                     hostname: 'TestHost',
@@ -38,7 +31,6 @@ exports.handler = async (event) => {
                     disk_usage: 75.0
                 }
             ];
-        }
 
         return {
             statusCode: 200,
@@ -46,7 +38,7 @@ exports.handler = async (event) => {
                 'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*'
             },
-            body: JSON.stringify(systemData)
+            body: JSON.stringify(dataToSend)
         };
     } catch (error) {
         console.error('Comprehensive Error in Serve Data:', error);

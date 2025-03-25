@@ -1,5 +1,7 @@
-const fs = require('fs').promises;
-const path = require('path');
+const crypto = require('crypto');
+
+// Global variable to store system data (will reset on each function cold start)
+let systemDataStore = [];
 
 exports.handler = async (event) => {
     console.log('Received request with method:', event.httpMethod);
@@ -15,27 +17,18 @@ exports.handler = async (event) => {
     try {
         // Parse incoming system data
         const systemData = JSON.parse(event.body);
+        
+        // Add received timestamp and unique ID
         systemData.receivedAt = new Date().toISOString();
+        systemData.id = crypto.randomBytes(8).toString('hex');
         
-        // Attempt to use persistent storage
-        const dataFilePath = path.join(__dirname, 'system_data.json');
+        // Add to global store
+        systemDataStore.push(systemData);
         
-        let existingData = [];
-        try {
-            const existingDataRaw = await fs.readFile(dataFilePath, 'utf8');
-            existingData = JSON.parse(existingDataRaw);
-        } catch (readError) {
-            console.warn('No existing data file found. Creating new one.');
+        // Keep only last 50 entries
+        if (systemDataStore.length > 50) {
+            systemDataStore = systemDataStore.slice(-50);
         }
-        
-        // Add new entry and keep last 50
-        existingData.push(systemData);
-        if (existingData.length > 50) {
-            existingData = existingData.slice(-50);
-        }
-        
-        // Write back to file
-        await fs.writeFile(dataFilePath, JSON.stringify(existingData, null, 2));
         
         return {
             statusCode: 200,
@@ -45,7 +38,8 @@ exports.handler = async (event) => {
             },
             body: JSON.stringify({ 
                 message: 'Data received successfully',
-                entriesCount: existingData.length 
+                entriesCount: systemDataStore.length,
+                lastEntryId: systemData.id
             })
         };
     } catch (error) {
@@ -60,3 +54,6 @@ exports.handler = async (event) => {
         };
     }
 };
+
+// Expose the data store for serve-data function
+exports.systemDataStore = systemDataStore;
