@@ -5,7 +5,6 @@ import socket
 from datetime import datetime
 import json
 import time
-import urllib.parse
 import logging
 
 # Configure logging
@@ -34,8 +33,8 @@ def send_data_to_netlify(url, data):
     if not url.startswith(('http://', 'https://')):
         url = f'https://{url}'
     
-    # Use full path to receive-data function
-    url = f"{url.rstrip('/')}/api/receive-data"
+    # Use the correct Netlify function path
+    url = f"{url.rstrip('/')}/.netlify/functions/receive-data"
     
     try:
         headers = {

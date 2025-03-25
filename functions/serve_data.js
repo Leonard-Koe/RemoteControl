@@ -1,9 +1,16 @@
-const { getSystemData } = require('./receive-data');
+// Global variable to simulate persistent storage
+let systemData = [];
 
-exports.handler = async (event, context) => {
+const handler = async (event, context) => {
+  // Only allow GET requests
+  if (event.httpMethod !== 'GET') {
+    return { 
+      statusCode: 405, 
+      body: JSON.stringify({ message: 'Method Not Allowed' }) 
+    };
+  }
+
   try {
-    const systemData = await getSystemData();
-
     return {
       statusCode: 200,
       headers: {
@@ -20,3 +27,15 @@ exports.handler = async (event, context) => {
     };
   }
 };
+
+// Modify this to update the global data
+const updateSystemData = (newData) => {
+  systemData.push(newData);
+  
+  // Keep only last 50 entries
+  if (systemData.length > 50) {
+    systemData = systemData.slice(-50);
+  }
+};
+
+module.exports = { handler, updateSystemData };
