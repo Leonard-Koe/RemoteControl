@@ -62,7 +62,7 @@ def send_data_to_netlify(url, data):
 
 def main():
     # Replace with your actual Netlify site URL
-    netlify_endpoint = "remotecontrol1.netlify.app"
+    netlify_endpoint = "remotecontrol1.netlify.app/systemdata.json"
     
     while True:
         try:

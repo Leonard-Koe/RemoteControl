@@ -15,7 +15,7 @@ exports.handler = async (event, context) => {
     const systemData = JSON.parse(event.body);
 
     // Use environment variable for data persistence
-    const dataFilePath = process.env.DATA_FILE_PATH;
+    const dataFilePath = process.env.DATA_FILE_PATH || '/tmp/system-data.json';
 
     // Read existing data
     let existingData = [];
