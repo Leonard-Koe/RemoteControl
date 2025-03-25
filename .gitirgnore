@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+
+# Node
+node_modules/
+.netlify/
+
+# OS generated files
+.DS_Store
+Thumbs.db

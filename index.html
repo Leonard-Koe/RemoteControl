@@ -1,18 +1,113 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Data Dashboard</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>System Monitor Dashboard</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        #last-updated {
+            text-align: center;
+            margin-top: 10px;
+            color: #666;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>System Data Dashboard</h1>
-        <div id="data-container">
-            <p>Keine Daten empfangen...</p>
-        </div>
-    </div>
-    <script src="script.js"></script>
+    <h1>System Monitor Dashboard</h1>
+    <div id="data-container">Loading...</div>
+    <div id="last-updated"></div>
+
+    <script>
+        async function loadSystemData() {
+            const dataContainer = document.getElementById('data-container');
+            const lastUpdatedContainer = document.getElementById('last-updated');
+            
+            try {
+                // Fetch the system data JSON file
+                const response = await fetch('/system-data.json');
+                const systemData = await response.json();
+
+                // If no data, show message
+                if (!systemData || systemData.length === 0) {
+                    dataContainer.innerHTML = '<p>No system data available</p>';
+                    return;
+                }
+
+                // Create table HTML (most recent data first)
+                const tableHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Hostname</th>
+                                <th>OS</th>
+                                <th>CPU Usage</th>
+                                <th>Memory Usage</th>
+                                <th>Memory Total (GB)</th>
+                                <th>Memory Available (GB)</th>
+                                <th>Disk Usage</th>
+                                <th>IP Address</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${systemData.map(entry => `
+                                <tr>
+                                    <td>${entry.timestamp}</td>
+                                    <td>${entry.hostname}</td>
+                                    <td>${entry.operating_system}</td>
+                                    <td>${entry.cpu_usage}%</td>
+                                    <td>${entry.memory_usage}%</td>
+                                    <td>${entry.memory_total.toFixed(2)}</td>
+                                    <td>${entry.memory_available.toFixed(2)}</td>
+                                    <td>${entry.disk_usage}%</td>
+                                    <td>${entry.ip_address}</td>
+                                </tr>
+                            `).reverse().join('')}
+                        </tbody>
+                    </table>
+                `;
+
+                dataContainer.innerHTML = tableHTML;
+                lastUpdatedContainer.innerHTML = `Last updated: ${new Date().toLocaleString()}`;
+            } catch (error) {
+                dataContainer.innerHTML = `<p>Error loading data: ${error.message}</p>`;
+            }
+        }
+
+        // Load data on page load
+        loadSystemData();
+
+        // Refresh data every minute
+        setInterval(loadSystemData, 60000);
+    </script>
 </body>
 </html>
