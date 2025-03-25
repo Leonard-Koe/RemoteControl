@@ -6,6 +6,11 @@ from datetime import datetime
 import json
 import time
 import urllib.parse
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, 
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 
 def get_system_info():
     """Collect comprehensive system information."""
@@ -45,19 +50,19 @@ def send_data_to_netlify(url, data):
         # Raise an exception for HTTP errors
         response.raise_for_status()
         
-        print("Data sent successfully!")
-        print("Server response:", response.json())
+        logging.info("Data sent successfully!")
+        logging.info(f"Server response: {response.json()}")
     except requests.exceptions.RequestException as e:
-        print(f"Error sending data: {e}")
+        logging.error(f"Error sending data: {e}")
         # More detailed error handling
         if hasattr(e, 'response') and e.response is not None:
-            print("Response content:", e.response.text)
+            logging.error(f"Response content: {e.response.text}")
         else:
-            print("No additional error details available.")
+            logging.error("No additional error details available.")
 
 def main():
-    # Prompt user for Netlify site URL
-    netlify_endpoint = "cheerful-mermaid-38ac59.netlify.app"
+    # Replace with your actual Netlify site URL
+    netlify_endpoint = "your-site-name.netlify.app"
     
     while True:
         try:
@@ -70,8 +75,8 @@ def main():
             # Wait for 5 minutes before next send
             time.sleep(300)
         except Exception as e:
-            print(f"Unexpected error: {e}")
-            print("Retrying in 1 minute...")
+            logging.error(f"Unexpected error: {e}")
+            logging.info("Retrying in 1 minute...")
             time.sleep(60)
 
 if __name__ == '__main__':
