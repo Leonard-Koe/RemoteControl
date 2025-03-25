@@ -1,26 +1,71 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Global Sensor Data</title>
+    <title>Sensor-Daten</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>Real-time Sensor Data</h1>
+        <h1>Echtzeit-Sensordaten</h1>
         
         <div id="serverConfig">
-            <label for="serverIP">WebSocket Server URL:</label>
-            <input type="text" id="serverIP" placeholder="wss://your-heroku-app.herokuapp.com">
-            <button id="connectBtn">Connect</button>
+            <label for="serverIP">WebSocket-Server-URL:</label>
+            <input type="text" id="serverIP" placeholder="wss://IhrBenutzername.websockets.pythonanywhere.com">
+            <button id="connectBtn">Verbinden</button>
         </div>
 
         <div id="connectionStatus"></div>
         <div id="dataDisplay">
-            <p>Enter server URL and connect</p>
+            <p>Server-URL eingeben und verbinden</p>
         </div>
     </div>
 
     <script src="script.js"></script>
 </body>
 </html>
+```
+
+<antArtifact identifier="frontend-styles" type="application/vnd.ant.code" language="css" title="CSS-Styles">
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.container {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 30px;
+    width: 100%;
+    max-width: 500px;
+}
+
+#serverConfig {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+#serverIP {
+    flex-grow: 1;
+    padding: 10px;
+    margin-right: 10px;
+}
+
+#connectBtn {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#dataDisplay {
+    background-color: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    padding: 15px;
+}
