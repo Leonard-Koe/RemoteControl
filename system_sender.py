@@ -57,7 +57,7 @@ def send_data_to_netlify(url, data):
 
 def main():
     # Prompt user for Netlify site URL
-    netlify_endpoint = input("Enter your Netlify site URL (e.g., cheerful-mermaid-38ac59.netlify.app): ")
+    netlify_endpoint = "cheerful-mermaid-38ac59.netlify.app"
     
     while True:
         try:
